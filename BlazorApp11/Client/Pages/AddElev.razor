@@ -1,0 +1,59 @@
+﻿@page "/AddElev"
+@using BlazorApp11.Shared
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<EditForm Model="@newElev" OnValidSubmit="Add">
+    <DataAnnotationsValidator/>
+    <div class="form-group">
+        <label for="nume">Nume:</label>
+        <input type="text" class="form-control" id="nume" @bind="newElev.Nume" />
+        <ValidationMessage For="@(() => newElev.Nume)" />
+    </div>
+    <div class="form-group">
+        <label for="prenume">Prenume:</label>
+        <input type="text" class="form-control" id="prenume" @bind="newElev.Prenume" />
+        <ValidationMessage For="@(() => newElev.Prenume)" />
+    </div>
+    <div class="form-group">
+        <label for="nota">Nota:</label>
+        <input type="number" class="form-control" id="nota" @bind="newElev.Nota" />
+        <ValidationMessage For="@(() => newElev.Nota)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Adauga Elev</button>
+</EditForm>
+
+@code {
+    private List<Elev> Elevi;
+    private Elev newElev = new Elev(); // New Elev to be added
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Make HTTP request to get all students
+        Elevi = await Http.GetFromJsonAsync<List<Elev>>("api/Elevs");
+    }
+
+    private async Task Add()
+    {
+        // Validate the form
+        if (Validator.TryValidateObject(newElev, new ValidationContext(newElev, null, null), null))
+        {
+            // Make HTTP request to add the new student
+            var response = await Http.PostAsJsonAsync("api/Elevs", newElev);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Reload the list of students after adding a new one
+                Elevi = await Http.GetFromJsonAsync<List<Elev>>("api/Elevs");
+
+                // Clear the form for the next entry
+                newElev = new Elev();
+            }
+            else
+            {
+                // Handle error if needed
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+        }
+    }
+}

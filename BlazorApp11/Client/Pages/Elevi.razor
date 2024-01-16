@@ -1,0 +1,72 @@
+﻿@page "/elevi"
+@using BlazorApp11.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<h3>Elevi</h3>
+
+<button class="btn btn-success" @onclick="AdaugaElev">Adauga Elev</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nume</th>
+            <th>Prenume</th>
+            <th>Nota</th>
+            <th>Actiuni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var elev in Elevii)
+        {
+            <tr>
+                <td>@elev.Nume</td>
+                <td>@elev.Prenume</td>
+                <td>@elev.Nota</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowElev(elev.Id))">
+                        <i class="oi oi-pencil"></i> Update
+                    </button>
+                    <button class="btn btn-danger" @onclick="(() => DeleteElev(elev.Id))">
+                        <i class="oi oi-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public List<Elev> Elevii { get; set; } = new List<Elev>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elevii = await Http.GetFromJsonAsync<List<Elev>>("api/Elevs");
+    }
+
+    private void AdaugaElev()
+    {
+        NavigationManager.NavigateTo("/AddElev");
+    }
+
+    private void ShowElev(int elevId)
+    {
+        // Implement the logic to navigate to the update page with the specific elevId
+        NavigationManager.NavigateTo($"/EditElev/{elevId}");
+    }
+
+    private async Task DeleteElev(int elevId)
+    {
+        var response = await Http.DeleteAsync($"api/Elevs/{elevId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            Elevii = await Http.GetFromJsonAsync<List<Elev>>("api/Elevs");
+        }
+        else
+        {
+            // Handle error if needed
+            Console.WriteLine($"Error: {response.StatusCode}");
+        }
+    }
+}

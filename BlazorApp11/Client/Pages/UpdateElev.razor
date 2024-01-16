@@ -1,0 +1,56 @@
+﻿<h3>EditElev</h3>
+
+@page "/EditElev/{id}"
+@using BlazorApp11.Shared
+@using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
+
+<EditForm Model="@newElev" OnValidSubmit="Update">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="nume">Nume:</label>
+        <input type="text" class="form-control" id="nume" @bind="newElev.Nume" />
+        <ValidationMessage For="@(() => newElev.Nume)" />
+    </div>
+    <div class="form-group">
+        <label for="prenume">Prenume:</label>
+        <input type="text" class="form-control" id="prenume" @bind="newElev.Prenume" />
+        <ValidationMessage For="@(() => newElev.Prenume)" />
+    </div>
+    <div class="form-group">
+        <label for="nota">Nota:</label>
+        <input type="number" class="form-control" id="nota" @bind="newElev.Nota" />
+        <ValidationMessage For="@(() => newElev.Nota)" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizeaza Elev</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    private Elev newElev = new Elev(); 
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Make HTTP request to get the specific student based on the provided ID
+        newElev = await Http.GetFromJsonAsync<Elev>($"api/Elevs/{id}");
+    }
+
+    private async Task Update()
+    {
+        if (Validator.TryValidateObject(newElev, new ValidationContext(newElev, null, null), null))
+        {
+            var response = await Http.PutAsJsonAsync($"api/Elevs/{id}", newElev);
+
+            if (response.IsSuccessStatusCode)
+            {
+                newElev = new Elev();
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+        }
+    }
+}
