@@ -11,9 +11,9 @@ namespace BlazorApp11.Shared
 	{
 		public int Id { get; set; }
 		[Required(ErrorMessage ="Camp obligatoriu")]
-		public string Nume { get; set; }
+		public string? Nume { get; set; }
         [Required(ErrorMessage = "Camp obligatoriu")]
-        public string Prenume { get; set; }
+        public string? Prenume { get; set; }
 		[Range(1,10,ErrorMessage ="Nota trebuie sa fie cuprinsa intre 1 la 10")]
 		public int Nota { get; set; }
 	}

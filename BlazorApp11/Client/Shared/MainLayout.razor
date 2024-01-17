@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using BlazorApp11.Client.Authentication
+@using BlazorApp11.Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authStateProvider
+
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +12,18 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <span>Hello, </span>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="hstack gap-3">
+                        <span>@context.User.Identity!.Name!</span>
+                        <i class="oi oi-power-standby text-danger fw-bold" style="cursor:pointer" @onclick="Logout"></i>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <span>Guest</span>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -15,3 +31,11 @@
         </article>
     </main>
 </div>
+
+@code {
+    public async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthentication)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession());
+    }
+}

@@ -1,0 +1,37 @@
+﻿@page "/eleviu"
+@using BlazorApp11.Shared
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<h3>Elevi</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nume</th>
+            <th>Prenume</th>
+            <th>Nota</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var elev in Elevii)
+        {
+            <tr>
+                <td>@elev.Nume</td>
+                <td>@elev.Prenume</td>
+                <td>@elev.Nota</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public List<Elev> Elevii { get; set; } = new List<Elev>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elevii = await Http.GetFromJsonAsync<List<Elev>>("api/Elevs");
+    }
+}
